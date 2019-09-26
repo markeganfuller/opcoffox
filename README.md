@@ -5,7 +5,7 @@ connected to a VPN without affecting the host's networking. This is especially
 useful where there's a requirement for connecting to multiple VPNs but one of
 the VPNs replaces the default route.
 
-THe base configuration expects a user/pass pin/rsa auth setup but can easily be
+The base configuration expects a user/pass pin/rsa auth setup but can easily be
 modified as required.
 
 ## Usage

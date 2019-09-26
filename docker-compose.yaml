@@ -1,0 +1,26 @@
+---
+version: '3'
+services:
+  openconnect:
+    image: mefdock/docker-arch-openconnect
+    # Override the entrypoint to allow us to provide the password / RSA on
+    # stdin
+    entrypoint: >
+      /bin/sh -c '
+      (echo "${PIN}${rsa}"; echo "$PASSWORD") |
+      openconnect "${URL}" --user "${USER}" --passwd-on-stdin -v
+      '
+    cap_add:
+      - NET_ADMIN
+
+  firefox:
+    image: mefdock/docker-arch-firefox
+    environment:
+      - DISPLAY=$DISPLAY
+    command: $HOMEPAGE
+    shm_size: 2g
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    network_mode: service:openconnect
+    depends_on:
+      - openconnect

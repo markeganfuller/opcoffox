@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Load config settings
+source ./config.sh
+
+# Allow access to xserver from docker
+xhost "+local:"
+
+# Startup
+docker-compose up
+
+# Cleanup
+docker-compose down
+xhost "-local:"

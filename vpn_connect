@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Ensure latest containers are pulled
+# Ignore 'variable is not set' errors
+docker-compose pull 2>/dev/null
+
 # Load config settings
 source ./config.sh
 

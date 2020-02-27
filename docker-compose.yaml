@@ -5,11 +5,16 @@ services:
     image: mefdock/docker-arch-openconnect
     # Override the entrypoint to allow us to provide the password / RSA on
     # stdin
-    entrypoint: >
-      /bin/sh -c '
-      (echo "${PIN}${rsa}"; echo "$PASSWORD") |
-      openconnect "${URL}" --user "${USER}" --passwd-on-stdin -v
-      '
+    environment:
+      - USERNAME=$USERNAME
+      - URL=$URL
+      - HOMEPAGE=$HOMEPAGE
+      - PIN=$PIN
+      - PASSWORD=$PASSWORD
+      - RSA=$RSA
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh
+    entrypoint: /entrypoint.sh
     cap_add:
       - NET_ADMIN
 

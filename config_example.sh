@@ -1,10 +1,7 @@
-export USER='exampleuser'
+export USERNAME='exampleuser'
 export URL='vpn.example.com'
 export HOMEPAGE='example.com'
 export PIN='000000'
 export PASSWORD='password'
-
-# Get RSA token
-echo -n "Enter RSA: "
-read -r rsa
-export rsa
+export RSATOKEN=''
+export COMPOSEOPTS='--abort-on-container-exit'

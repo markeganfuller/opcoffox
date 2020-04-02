@@ -1,61 +1,86 @@
 #!/bin/bash
 
+DOCKER_COMPOSE_FILE='/usr/lib/opcoffox/docker-compose.yaml'
+
 # Ensure latest containers are pulled
 # Ignore 'variable is not set' errors
-docker-compose pull 2>/dev/null
+docker-compose -f "${DOCKER_COMPOSE_FILE}" pull 2>/dev/null
 
 # Load config settings
-source ./config.sh
+if [ -f ~/.opcoffox ]; then
+    CONFIG_FILE="${HOME}/.opcoffox"
+elif [ -f /etc/opcoffox/config ]; then
+    CONFIG_FILE='/etc/opcoffox/config'
+else
+    echo "\
+Config file not found in ~/.opcoffox or /etc/opcoffox/config
+
+Please configure opcoffox using the example file at:
+/usr/share/opcoffox/config_example
+"
+    exit 1
+fi
+
+if [ "$(stat -c "%a" "${CONFIG_FILE}")" != "600" ]; then
+    echo "\
+Incorrect permissions on ${CONFIG_FILE}
+
+Permissions should be 600
+"
+    exit 1
+fi
 
 # Get the VPN URL from the user if we haven't got one.
 if [ "${URL}" = "" ]; then
-	read -p 'Enter VPN URL: ' -r URL
-	export URL
+    read -p 'Enter VPN URL: ' -r URL
+    export URL
 fi;
 
 # Default Homepage if not specified
 if [ "${HOMEPAGE}" = "" ]; then
-	HOMEPAGE='google.com'
-	export HOMEPAGE
+    HOMEPAGE='google.com'
+    export HOMEPAGE
 fi;
 
 # Get the Username from the user if we haven't got one.
 if [ "${USERNAME}" = "" ]; then
-	read -p 'Enter Username: ' -r USERNAME
-	export USERNAME
+    read -p 'Enter Username: ' -r USERNAME
+    export USERNAME
 fi;
 
 # Get the password from the user if we haven't got one.
 if [ "${PASSWORD}" = "" ]; then
-	read -p 'Enter Password: ' -rs PASSWORD
-	echo ""
-	export PASSWORD
+    read -p 'Enter Password: ' -rs PASSWORD
+    echo ""
+    export PASSWORD
 fi;
 
 # Get the password from the user if we haven't got one.
 if [ "${PIN}" = "" ]; then
-	read -p 'Enter RSA Token Pin: ' -rs PIN
-	echo ""
-	export PIN
+    read -p 'Enter RSA Token Pin: ' -rs PIN
+    echo ""
+    export PIN
 fi;
 
 # Get RSA token if we have been provided a seed
 STOKEN=$(command -v stoken)
 if [ "${STOKEN}" != "" ] && [ "${RSATOKEN}" != "" ]; then
-	export RSA=$(${STOKEN} --token "${RSATOKEN}" 2>&1)
+    # shellcheck disable=SC2155
+    export RSA=$(${STOKEN} --token "${RSATOKEN}" 2>&1)
 fi;
 # Get the RSA token from the user if we haven't got one.
 if [ "${RSA}" = "" ]; then
-	read -p 'Enter RSA Token: ' -rs RSA
-	export RSA
+    read -p 'Enter RSA Token: ' -rs RSA
+    export RSA
 fi;
 
 # Allow access to xserver from docker
 xhost "+local:"
 
 # Startup
-docker-compose up ${COMPOSEOPTS}
+# shellcheck disable=SC2086
+docker-compose -f "${DOCKER_COMPOSE_FILE}" up ${COMPOSEOPTS}
 
 # Cleanup
-docker-compose down
+docker-compose -f "${DOCKER_COMPOSE_FILE}" down
 xhost "-local:"

@@ -40,9 +40,9 @@ if [ "${PIN}" = "" ]; then
 fi;
 
 # Get RSA token if we have been provided a seed
-STOKEN=`which stoken`
-if [ "${STOKEN}" != "" -a "${RSATOKEN}" != "" ]; then
-	export RSA=`${STOKEN} --token "${RSATOKEN}" 2>&1`
+STOKEN=$(command -v stoken)
+if [ "${STOKEN}" != "" ] && [ "${RSATOKEN}" != "" ]; then
+	export RSA=$(${STOKEN} --token "${RSATOKEN}" 2>&1)
 fi;
 # Get the RSA token from the user if we haven't got one.
 if [ "${RSA}" = "" ]; then

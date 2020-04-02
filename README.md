@@ -14,7 +14,7 @@ modified as required.
 cp config_example.sh config.sh
 vim config.sh
 
-./vpn_connect
+./opcoffox
 ```
 
 Hit `CTRL+C` to terminate the session.

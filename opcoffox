@@ -30,9 +30,40 @@ Permissions should be 600
     exit 1
 fi
 
+source "${CONFIG_FILE}"
+
+function get_input() {
+    desc=$1
+    secure=$2
+
+    if [ -t 0 ]; then
+        # If in terminal ask directly
+        if [ -z "$secure" ]; then
+            read -p "Enter ${desc}: " -r input_value
+        else
+            read -p "Enter ${desc}: " -rs input_value
+            echo "" >&2
+        fi
+    else
+        # If not in term and Xdialog installed use that
+        if command -v Xdialog > /dev/null 2>&1; then
+            if [ -z "$secure" ]; then
+                input_value=$(Xdialog --stdout --title "opcoffox" --inputbox "opcoffox\nRSA PIN" 15 36)
+            else
+                input_value=$(Xdialog --stdout --title "opcoffox" --passwordbox "opcoffox\nRSA PIN" 15 36)
+            fi
+        else
+            echo "Xdialog not found and not running in an interactive terminal." >&2
+            exit 1
+        fi
+    fi
+
+    echo "$input_value"
+}
+
 # Get the VPN URL from the user if we haven't got one.
 if [ "${URL}" = "" ]; then
-    read -p 'Enter VPN URL: ' -r URL
+    URL=$(get_input 'VPN URL')
     export URL
 fi;
 
@@ -44,21 +75,19 @@ fi;
 
 # Get the Username from the user if we haven't got one.
 if [ "${USERNAME}" = "" ]; then
-    read -p 'Enter Username: ' -r USERNAME
+    USERNAME=$(get_input 'Username')
     export USERNAME
 fi;
 
 # Get the password from the user if we haven't got one.
 if [ "${PASSWORD}" = "" ]; then
-    read -p 'Enter Password: ' -rs PASSWORD
-    echo ""
+    PASSWORD=$(get_input 'Password' 'secure')
     export PASSWORD
 fi;
 
-# Get the password from the user if we haven't got one.
+# Get the pin from the user if we haven't got one.
 if [ "${PIN}" = "" ]; then
-    read -p 'Enter RSA Token Pin: ' -rs PIN
-    echo ""
+    PIN=$(get_input 'PIN' 'secure')
     export PIN
 fi;
 
@@ -70,7 +99,7 @@ if [ "${STOKEN}" != "" ] && [ "${RSATOKEN}" != "" ]; then
 fi;
 # Get the RSA token from the user if we haven't got one.
 if [ "${RSA}" = "" ]; then
-    read -p 'Enter RSA Token: ' -rs RSA
+    RSA=$(get_input 'RSA Token' 'secure')
     export RSA
 fi;
 

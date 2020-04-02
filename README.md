@@ -18,3 +18,9 @@ vim config.sh
 ```
 
 Hit `CTRL+C` to terminate the session.
+
+## Requirements
+
+* docker
+* docker-compose
+* Xdialog if not running from an interactive terminal

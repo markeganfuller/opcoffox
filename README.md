@@ -11,16 +11,28 @@ modified as required.
 ## Usage
 
 ```
-cp config_example.sh config.sh
-vim config.sh
+cp /usr/share/opcoffox/config_example ~/.opcoffox
+vim ~/.opcoffox
+chmod 600 ~/.opcoffox
 
 ./opcoffox
 ```
 
-Hit `CTRL+C` to terminate the session.
+Exiting the browser will terminate both the browser and the connection with the
+default `$COMPOSEOPTS` setting.
 
 ## Requirements
 
 * docker
 * docker-compose
 * Xdialog if not running from an interactive terminal
+
+## Changelog
+
+### 1.0.0
+
+* Rename main script to `opcoffox`
+* Shellcheck fixes
+* Add a Makefile and adjust paths for /usr/bin installation
+* Add Xdialog for handling launching from GUI aswell as terminal
+* Add package building for RPM / DEB

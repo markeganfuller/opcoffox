@@ -36,3 +36,4 @@ default `$COMPOSEOPTS` setting.
 * Add a Makefile and adjust paths for /usr/bin installation
 * Add Xdialog for handling launching from GUI aswell as terminal
 * Add package building for RPM / DEB
+* Adjust handling of pull errors so output is still visible

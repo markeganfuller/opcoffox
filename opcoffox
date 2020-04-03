@@ -4,7 +4,7 @@ DOCKER_COMPOSE_FILE='/usr/lib/opcoffox/docker-compose.yaml'
 
 # Ensure latest containers are pulled
 # Ignore 'variable is not set' errors
-docker-compose -f "${DOCKER_COMPOSE_FILE}" pull 2>/dev/null
+docker-compose -f "${DOCKER_COMPOSE_FILE}" pull 2>&1 | grep -v 'variable is not set'
 
 # Load config settings
 if [ -f ~/.opcoffox ]; then

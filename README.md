@@ -29,7 +29,7 @@ default `$COMPOSEOPTS` setting.
 
 ## Installation
 
-```
+```bash
 # Generic Linux
 sudo make install
 
@@ -41,6 +41,8 @@ rpm -i opcoffox-${VERSION}.rpm
 make deb
 dpkg -i opcoffox-${VERSION}.deb
 ```
+
+For Arch its available on the [AUR](https://aur.archlinux.org/packages/opcoffox/)
 
 ## Changelog
 

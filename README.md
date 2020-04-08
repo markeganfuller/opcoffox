@@ -27,6 +27,21 @@ default `$COMPOSEOPTS` setting.
 * docker-compose
 * Xdialog if not running from an interactive terminal
 
+## Installation
+
+```
+# Generic Linux
+sudo make install
+
+# Redhat
+make rpm
+rpm -i opcoffox-${VERSION}.rpm
+
+# Debian
+make deb
+dpkg -i opcoffox-${VERSION}.deb
+```
+
 ## Changelog
 
 ### 1.0.0

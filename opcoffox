@@ -2,35 +2,23 @@
 
 DOCKER_COMPOSE_FILE='/usr/lib/opcoffox/docker-compose.yaml'
 
-# Ensure latest containers are pulled
-# Ignore 'variable is not set' errors
-docker-compose -f "${DOCKER_COMPOSE_FILE}" pull 2>&1 | grep -v 'variable is not set'
-
-# Load config settings
-if [ -f ~/.opcoffox ]; then
-    CONFIG_FILE="${HOME}/.opcoffox"
-elif [ -f /etc/opcoffox/config ]; then
-    CONFIG_FILE='/etc/opcoffox/config'
-else
-    echo "\
-Config file not found in ~/.opcoffox or /etc/opcoffox/config
-
-Please configure opcoffox using the example file at:
-/usr/share/opcoffox/config_example
-"
-    exit 1
-fi
-
-if [ "$(stat -c "%a" "${CONFIG_FILE}")" != "600" ]; then
-    echo "\
-Incorrect permissions on ${CONFIG_FILE}
-
-Permissions should be 600
-"
-    exit 1
-fi
-
-source "${CONFIG_FILE}"
+function output(){
+    msg=$1
+    timeout=$2
+    if [ -t 0 ]; then
+        echo "$msg"
+    elif command -v Xdialog > /dev/null 2>&1; then
+        if [ "$timeout" -gt 0 ]; then
+            # Note we background here so we can carry on
+            Xdialog --title "opcoffox" --no-buttons --infobox "$msg" 11 79 $timeout &
+        else
+            Xdialog --title "opcoffox" --msgbox "$msg" 11 79
+        fi
+    else
+        echo "Xdialog not found and not running in an interactive terminal." >&2
+        exit 1
+    fi
+}
 
 function get_input() {
     desc=$1
@@ -60,6 +48,37 @@ function get_input() {
 
     echo "$input_value"
 }
+
+output "Pulling latest containers" 5000
+# Ignore 'variable is not set' errors
+docker-compose -f "${DOCKER_COMPOSE_FILE}" pull 2>&1 | grep -v 'variable is not set'
+output "Latest containers pulled" 3000
+
+# Load config settings
+if [ -f ~/.opcoffox ]; then
+    CONFIG_FILE="${HOME}/.opcoffox"
+elif [ -f /etc/opcoffox/config ]; then
+    CONFIG_FILE='/etc/opcoffox/config'
+else
+    output "\
+Config file not found in ~/.opcoffox or /etc/opcoffox/config
+
+Please configure opcoffox using the example file at:
+/usr/share/opcoffox/config_example
+" 0
+    exit 1
+fi
+
+if [ "$(stat -c "%a" "${CONFIG_FILE}")" != "600" ]; then
+    output "\
+Incorrect permissions on ${CONFIG_FILE}
+
+Permissions should be 600
+" 0
+    exit 1
+fi
+
+source "${CONFIG_FILE}"
 
 # Get the VPN URL from the user if we haven't got one.
 if [ "${URL}" = "" ]; then
@@ -97,6 +116,7 @@ if [ "${STOKEN}" != "" ] && [ "${RSATOKEN}" != "" ]; then
     # shellcheck disable=SC2155
     export RSA=$(${STOKEN} --token "${RSATOKEN}" 2>&1)
 fi;
+
 # Get the RSA token from the user if we haven't got one.
 if [ "${RSA}" = "" ]; then
     RSA=$(get_input 'RSA Token' 'secure')
@@ -106,10 +126,12 @@ fi;
 # Allow access to xserver from docker
 xhost "+local:"
 
+output "Starting..." 2000
 # Startup
 # shellcheck disable=SC2086
 docker-compose -f "${DOCKER_COMPOSE_FILE}" up ${COMPOSEOPTS}
 
 # Cleanup
+output "Cleaning up..." 3000
 docker-compose -f "${DOCKER_COMPOSE_FILE}" down
 xhost "-local:"

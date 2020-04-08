@@ -8,9 +8,12 @@ function output(){
     if [ -t 0 ]; then
         echo "$msg"
     elif command -v Xdialog > /dev/null 2>&1; then
+        # Clean up our previous output dialog so we don't stack
+        kill "$OUTPUT_PID" > /dev/null  2>&1
         if [ "$timeout" -gt 0 ]; then
             # Note we background here so we can carry on
-            Xdialog --title "opcoffox" --no-buttons --infobox "$msg" 11 79 $timeout &
+            Xdialog --title "opcoffox" --no-buttons --infobox "$msg" 11 79 "$timeout" &
+            OUTPUT_PID=$!
         else
             Xdialog --title "opcoffox" --msgbox "$msg" 11 79
         fi
@@ -35,6 +38,8 @@ function get_input() {
     else
         # If not in term and Xdialog installed use that
         if command -v Xdialog > /dev/null 2>&1; then
+            # Clean up our previous output dialog so we don't stack
+            kill "$OUTPUT_PID" > /dev/null  2>&1
             if [ -z "$secure" ]; then
                 input_value=$(Xdialog --stdout --title "opcoffox" --inputbox "opcoffox\nRSA PIN" 15 36)
             else

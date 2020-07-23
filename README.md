@@ -46,6 +46,10 @@ For Arch its available on the [AUR](https://aur.archlinux.org/packages/opcoffox/
 
 ## Changelog
 
+### 1.1.0
+
+* Add ability to set a downloads folder, fixing issue #2
+
 ### 1.0.0
 
 * Rename main script to `opcoffox`

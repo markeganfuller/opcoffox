@@ -1,6 +1,7 @@
 export USERNAME='exampleuser'
 export URL='vpn.example.com'
 export HOMEPAGE='example.com'
+export DOWNLOADS='/home/exampleuser/downloads'
 export PIN='000000'
 export PASSWORD='password'
 export RSATOKEN=''

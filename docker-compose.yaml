@@ -27,6 +27,7 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ${HOME}:${HOME}:ro
+      - ${DOWNLOADS}:/downloads
     network_mode: service:openconnect
     depends_on:
       - openconnect
